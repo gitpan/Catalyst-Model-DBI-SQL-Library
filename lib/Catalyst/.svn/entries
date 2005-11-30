@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="12"
+   name=""
+   committed-date="2005-11-29T21:33:06.114071Z"
+   url="https://node3/misc/trunk/Catalyst-Model-DBI-SQL-Library/lib/Catalyst"
+   last-author="alex"
+   kind="dir"
+   uuid="9580a9e1-9306-0410-a291-bfabde4dd1bd"
+   repos="https://node3/misc"
+   revision="12"/>
+<entry
+   name="Helper"
+   kind="dir"/>
+<entry
+   name="Model"
+   kind="dir"/>
+</wc-entries>

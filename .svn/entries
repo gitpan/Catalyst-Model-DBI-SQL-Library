@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="12"
+   name=""
+   committed-date="2005-11-29T21:33:06.114071Z"
+   url="https://node3/misc/trunk/Catalyst-Model-DBI-SQL-Library"
+   last-author="alex"
+   kind="dir"
+   uuid="9580a9e1-9306-0410-a291-bfabde4dd1bd"
+   repos="https://node3/misc"
+   revision="12"/>
+<entry
+   name="t"
+   kind="dir"/>
+<entry
+   name="lib"
+   kind="dir"/>
+<entry
+   committed-rev="12"
+   name="MANIFEST"
+   text-time="2005-11-30T03:57:59.000000Z"
+   committed-date="2005-11-29T21:33:06.114071Z"
+   checksum="d5bc127bd71a7c51cb3f2a2c9327f546"
+   last-author="alex"
+   kind="file"
+   prop-time="2005-11-30T03:57:59.000000Z"/>
+<entry
+   committed-rev="12"
+   name="META.yml"
+   text-time="2005-11-30T03:57:59.000000Z"
+   committed-date="2005-11-29T21:33:06.114071Z"
+   checksum="63238f54af1dcb316ee8acfc23dd8ace"
+   last-author="alex"
+   kind="file"
+   prop-time="2005-11-30T03:57:59.000000Z"/>
+<entry
+   committed-rev="12"
+   name="Makefile.PL"
+   text-time="2005-11-30T03:57:59.000000Z"
+   committed-date="2005-11-29T21:33:06.114071Z"
+   checksum="4e3a82a56650a037bfb850b8bfaf8ae5"
+   last-author="alex"
+   kind="file"
+   prop-time="2005-11-30T03:57:59.000000Z"/>
+<entry
+   committed-rev="12"
+   name="Changes"
+   text-time="2005-11-30T03:57:59.000000Z"
+   committed-date="2005-11-29T21:33:06.114071Z"
+   checksum="0d35a4d1c03598b0e583a77d42dd5d66"
+   last-author="alex"
+   kind="file"
+   prop-time="2005-11-30T03:57:59.000000Z"/>
+<entry
+   committed-rev="31"
+   name="README"
+   text-time="2005-11-30T09:11:42.000000Z"
+   committed-date="2005-11-30T09:11:48.322846Z"
+   checksum="078ecaf73fd998d2a4f48d1e9ca34c68"
+   last-author="alex"
+   kind="file"
+   prop-time="2005-11-30T03:57:59.000000Z"
+   revision="31"/>
+</wc-entries>

@@ -1,4 +1,6 @@
 Revision history for Perl extension Catalyst::Model::DBI::SQL::Library.
 
+0.11  Wed Dec 14 12:00:00 2005
+	- minor changes
 0.10  Sun Nov 29 15:00:00 2005
         - first release

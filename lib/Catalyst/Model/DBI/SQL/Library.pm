@@ -6,7 +6,7 @@ use NEXT;
 use SQL::Library;
 use File::Spec;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 __PACKAGE__->mk_accessors('sql');
 

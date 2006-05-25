@@ -19,15 +19,16 @@ SSYYNNOOPPSSIISS
                        password      => '',
                        user          => 'postgres',
                        options       => { AutoCommit => 1 },
+                       sqldir        => 'root/sql' #optional, will default to $c->config->{root}
                );
 
                1;
 
                my $model = $c->model( 'DBI::SQL::Library' );
-               my $sql = $model->load ( $c, 'sql/something.sql' ) ;
+               my $sql = $model->load ( 'something.sql' ) ;
 
-               #or my $sql = $model->load ( $c, [ <FH> ] );
-               #or my $sql = $model->load ( $c, [ $sql_query1, $sql_query2 ] ) )
+               #or my $sql = $model->load ( [ <FH> ] );
+               #or my $sql = $model->load ( [ $sql_query1, $sql_query2 ] ) )
 
                my $query = $sql->retr ( 'some_sql_query' );
 
@@ -45,7 +46,7 @@ DDEESSCCRRIIPPTTIIOONN
 MMEETTHHOODDSS
        new Initializes database connection
 
-       load
+       $self->load
            Initializes "SQL::Library" instance
 
        $self->dbh
@@ -66,4 +67,4 @@ CCOOPPYYRRIIGGHHTT
 
 
 
-perl v5.8.7                       2005-11-C3a0talyst::Model::DBI::SQL::Library(3)
+perl v5.8.8                       2006-05-C2a5talyst::Model::DBI::SQL::Library(3)

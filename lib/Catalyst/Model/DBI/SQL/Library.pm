@@ -6,7 +6,7 @@ use NEXT;
 use SQL::Library;
 use File::Spec;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 __PACKAGE__->mk_accessors('sql');
 
@@ -29,15 +29,16 @@ Catalyst::Model::DBI::SQL::Library - SQL::Library DBI Model Class
 		password      => '',
 		user          => 'postgres',
 		options       => { AutoCommit => 1 },
+		sqldir        => 'root/sql' #optional, will default to $c->config->{root}
 	);
-	
+
 	1;
 	
 	my $model = $c->model( 'DBI::SQL::Library' );
-	my $sql = $model->load ( $c, 'sql/something.sql' ) ;
+	my $sql = $model->load ( 'something.sql' ) ;
 	
-	#or my $sql = $model->load ( $c, [ <FH> ] );
-	#or my $sql = $model->load ( $c, [ $sql_query1, $sql_query2 ] ) )
+	#or my $sql = $model->load ( [ <FH> ] );
+	#or my $sql = $model->load ( [ $sql_query1, $sql_query2 ] ) )
 	
 	my $query = $sql->retr ( 'some_sql_query' );
 	
@@ -63,8 +64,11 @@ Initializes database connection
 =cut 
 
 sub new {
-    my ( $self, $c ) = @_;
-    $self = $self->NEXT::new($c);
+	my ( $self, $c ) = @_;
+	$self = $self->NEXT::new($c);
+	$self->{sqldir} ||= $c->config->{root};
+	$self->{log} = $c->log;
+	$self->{debug} = $c->debug;
 	return $self;
 }
 
@@ -75,13 +79,18 @@ Initializes C<SQL::Library> instance
 =cut
 
 sub load {
-	my ( $self, $c, $source ) = @_;
-	$source = File::Spec->catfile ( $c->config->{root}, $source ) 
-		unless ref $source eq q{ARRAY};
+	my ( $self, $source ) = @_;
+	$source = File::Spec->catfile ( $self->{sqldir}, $source ) 
+		unless ref $source eq 'ARRAY';
 	eval { $self->sql ( SQL::Library->new ( { lib => $source } ) ); };
-	if ($@) { $c->log->debug( qq{Couldn't create SQL::Library instance "$@"} ) if $c->debug; }
-    else { $c->log->debug ( q{SQL::Library instance created} ) if $c->debug; }	
-    return $self->sql;
+	if ($@) {
+		$self->{log}->debug( qq{Couldn't create SQL::Library instance for: "$source" Error: "$@"} ) 
+			if $self->{debug}; 
+	} else { 
+		$self->{log}->debug ( qq{SQL::Library instance created for: "$source"} ) 
+			if $self->{debug}; 
+	}
+	return $self->sql;
 }
 
 =item $self->dbh

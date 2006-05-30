@@ -6,7 +6,7 @@ use NEXT;
 use SQL::Library;
 use File::Spec;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 __PACKAGE__->mk_accessors('sql');
 
@@ -29,7 +29,7 @@ Catalyst::Model::DBI::SQL::Library - SQL::Library DBI Model Class
 		password      => '',
 		user          => 'postgres',
 		options       => { AutoCommit => 1 },
-		sqldir        => 'root/sql' #optional, will default to $c->config->{root}
+		sqldir        => 'root/sql' #optional, will default to $c->path_to ( 'root/sql' )
 	);
 
 	1;
@@ -66,7 +66,7 @@ Initializes database connection
 sub new {
 	my ( $self, $c ) = @_;
 	$self = $self->NEXT::new($c);
-	$self->{sqldir} ||= $c->config->{root};
+	$self->{sqldir} ||= $c->path_to ( 'root/sql' );
 	$self->{log} = $c->log;
 	$self->{debug} = $c->debug;
 	return $self;
@@ -80,8 +80,7 @@ Initializes C<SQL::Library> instance
 
 sub load {
 	my ( $self, $source ) = @_;
-	$source = File::Spec->catfile ( $self->{sqldir}, $source ) 
-		unless ref $source eq 'ARRAY';
+	$source = File::Spec->catfile ( $self->{sqldir}, $source ) unless ref $source eq 'ARRAY';
 	eval { $self->sql ( SQL::Library->new ( { lib => $source } ) ); };
 	if ($@) {
 		$self->{log}->debug( qq{Couldn't create SQL::Library instance for: "$source" Error: "$@"} ) 

@@ -1,5 +1,6 @@
 Revision history for Perl extension Catalyst::Model::DBI::SQL::Library.
-
+0.14  Mon Jul 24 12:00:00 2006
+	- added new object caching support
 0.13  Tue May 30 12:00:00 2006
 	- added path_to support
 0.12  Wed May 25 02:23:00 2006

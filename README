@@ -15,11 +15,13 @@ SSYYNNOOPPSSIISS
                use base 'Catalyst::Model::DBI::SQL::Library';
 
                __PACKAGE__->config(
-                       dsn           => 'dbi:Pg:dbname=myapp',
-                       password      => '',
-                       user          => 'postgres',
-                       options       => { AutoCommit => 1 },
-                       sqldir        => 'root/sql' #optional, will default to $c->path_to ( 'root/sql' )
+                       dsn                     => 'dbi:Pg:dbname=myapp',
+                       password                => '',
+                       user                    => 'postgres',
+                       options                 => { AutoCommit => 1 },
+                       sqldir                  => 'root/sql' #optional, will default to $c->path_to ( 'root/sql' ),
+                       sqlcache                => 1 #can only be used when queries are loaded from file i.e. via scalar passed to load
+                       sqlcache_use_mtime      => 1 #will use modification time of the file to determine when to refresh the cache
                );
 
                1;
@@ -40,8 +42,19 @@ SSYYNNOOPPSSIISS
 
 DDEESSCCRRIIPPTTIIOONN
        This is the "SQL::Library" model class. It provides access to
-       "SQL::Library" via sql accessor. Please refer to "SQL::Library" for
-       more information.
+       "SQL::Library" via sql accessor. Additional caching options are pro-
+       vided for increased performance via sqlcache and sqlcache_use_mtime,
+       these options can only be used when sql strings are stored within a
+       file and loaded by using a scalar value passed to load. The load and
+       parse phase is then bypassed if cached version of the file is found.
+       The use of these options can result in more memory being used but
+       faster access to query data when running under persistent environment
+       such as mod_perl or FastCGI. When sqlcache_use_mtime is in use, last
+       modification time of the file is being referenced upon every cache
+       check. If the modification time has changed query file is then
+       re-loaded. This may slower the application a little bit, but should
+       still be much faster then re-creating the SQL::Library instance on
+       every load. Please refer to the "SQL::Library" for more information.
 
 MMEETTHHOODDSS
        new Initializes database connection
@@ -67,4 +80,4 @@ CCOOPPYYRRIIGGHHTT
 
 
 
-perl v5.8.8                       2006-05-C3a0talyst::Model::DBI::SQL::Library(3)
+perl v5.8.8                       2006-07-C2a4talyst::Model::DBI::SQL::Library(3)

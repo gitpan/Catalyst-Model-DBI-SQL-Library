@@ -6,7 +6,7 @@ use NEXT;
 use SQL::Library;
 use File::Spec;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 __PACKAGE__->mk_accessors('sql');
 
@@ -75,8 +75,8 @@ Initializes database connection
 =cut 
 
 sub new {
-	my ( $self, $c ) = @_;
-	$self = $self->NEXT::new($c);
+	my ( $self, $c, @args ) = @_;
+	$self = $self->NEXT::new( $c, @args );
 	$self->{sqldir} ||= $c->path_to ( 'root/sql' );
 	$self->{log} = $c->log;
 	$self->{debug} = $c->debug;

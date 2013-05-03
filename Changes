@@ -1,4 +1,6 @@
 Revision history for Perl extension Catalyst::Model::DBI::SQL::Library.
+0.16  Thu May 02 22:45:00 2013
+        - fixed Makefile.PL, added proper log levels
 0.15  Sat Mar 10 11:00:00 2007
         - fixed YAML issue as reported on mailing list
 0.14  Mon Jul 24 12:00:00 2006

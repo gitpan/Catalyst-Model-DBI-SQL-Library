@@ -1,18 +1,15 @@
 package Catalyst::Model::DBI::SQL::Library;
 
 use strict;
-use base qw/Catalyst::Model::DBI/;
+use base 'Catalyst::Model::DBI';
+
 use NEXT;
 use SQL::Library;
 use File::Spec;
 
 use constant DEFAULT_ROOT_PATH => 'root/sql';
 
-use constant LOG_LEVEL_BASIC => 1;
-use constant LOG_LEVEL_MEDIUM => 2;
-use constant LOG_LEVEL_FULL => 3;
-
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 __PACKAGE__->mk_accessors('sql');
 
@@ -106,9 +103,6 @@ sub new {
   my ( $self, $c, @args ) = @_;
   $self = $self->NEXT::new( $c, @args );
   $self->{sqldir} ||= $c->path_to( DEFAULT_ROOT_PATH );
-  $self->{loglevel} ||= LOG_LEVEL_BASIC;
-  $self->{log} = $c->log;
-  $self->{debug} = $c->debug;
   return $self;
 }
 
@@ -121,26 +115,31 @@ Initializes C<SQL::Library> instance
 sub load {
   my ( $self, $source ) = @_;
   $source = File::Spec->catfile( $self->{sqldir}, $source ) unless ref $source eq 'ARRAY';
+  
+  my $log = $self->{log};
+  my $debug = $self->{debug};
+  my $loglevel = $self->{loglevel};
+  
   if ( ref $source ne 'ARRAY' && $self->{sqlcache} && exists $self->{obj_cache}->{$source} ) {
     my $source_cached = $self->{obj_cache}->{$source};
     if ( $self->{sqlcache_use_mtime} && exists $source_cached->{mtime} ) {
       my $mtime_current = $self->_extract_mtime( $source );
       if ( $mtime_current != $source_cached->{mtime} ) {
-        $self->{log}->debug(
+        $log->debug(
           qq/mtime changed for cached SQL::Library instance with path: "$source", reloading/
-        ) if $self->{debug} && $self->{loglevel} >= LOG_LEVEL_MEDIUM;
+        ) if $debug && $loglevel >= $self->LOG_LEVEL_INTERMEDIATE;
         $self->_load_instance( $source );
       } else {
         $self->sql( $source_cached->{sql} );
-        $self->{log}->debug(
+        $log->debug(
           qq/cached SQL::Library instance with path: "$source" and mtime: "$mtime_current" found/
-        ) if $self->{debug} && $self->{loglevel} == LOG_LEVEL_FULL;
+        ) if $debug && $loglevel == $self->LOG_LEVEL_FULL;
       }
     } else {
       $self->sql( $source_cached->{sql} );
-      $self->{log}->debug(
+      $log->debug(
         qq/cached SQL::Library instance with path: "$source" found/
-      ) if $self->{debug} && $self->{loglevel} == LOG_LEVEL_FULL;
+      ) if $debug && $loglevel == $self->LOG_LEVEL_FULL;
     }
   } else {
     $self->_load_instance( $source );
@@ -150,15 +149,20 @@ sub load {
 
 sub _load_instance {
   my ( $self, $source ) = @_;
+  
+  my $log = $self->{log};
+  my $debug = $self->{debug};
+  my $loglevel = $self->{loglevel};
+  
   eval { $self->sql( SQL::Library->new( { lib => $source } ) ); };
   if ( $@ ) {
-    $self->{log}->debug(
+    $log->debug(
       qq/couldn't create SQL::Library instance with path: "$source" error: "$@"/
-    ) if $self->{debug} && $self->{loglevel} >= LOG_LEVEL_BASIC;
+    ) if $debug && $loglevel >= $self->LOG_LEVEL_BASIC;
   } else {
-    $self->{log}->debug(
+    $log->debug(
       qq/SQL::Library instance created with path: "$source"/
-    ) if $self->{debug} && $self->{loglevel} >= LOG_LEVEL_BASIC;
+    ) if $debug && $loglevel >= $self->LOG_LEVEL_BASIC;
     if ( $self->{sqlcache} && ref $source ne 'ARRAY' ) {
       if ( $self->{sqlcache_use_mtime} ) {
         my $mtime = $self->_extract_mtime( $source );
@@ -166,14 +170,14 @@ sub _load_instance {
           sql => $self->sql,
           mtime => $mtime
         }; 
-        $self->{log}->debug(
+        $log->debug(
           qq/caching SQL::Library instance with path: "$source" and mtime: "$mtime"/
-        ) if $self->{debug} && $self->{loglevel} >= LOG_LEVEL_MEDIUM;
+        ) if $debug && $loglevel >= $self->LOG_LEVEL_INTERMEDIATE;
       } else {
         $self->{obj_cache}->{$source} = { sql => $self->sql };
-        $self->{log}->debug(
+        $log->debug(
           qq/caching SQL::Library instance with path: "$source"/
-        ) if $self->{debug} && $self->{loglevel} >= LOG_LEVEL_MEDIUM;
+        ) if $debug && $loglevel >= $self->LOG_LEVEL_INTERMEDIATE;
       }
     }
   }
@@ -181,13 +185,14 @@ sub _load_instance {
 
 sub _extract_mtime {
   my ( $self, $source ) = @_;
+  
   my $mtime;
   if (-r $source) {
     $mtime = return (stat(_))[9];
   } else {
     $self->{log}->debug(
       qq/couldn't extract modification time for path: "$source"/
-    ) if $self->{debug} && $self->{loglevel} >= LOG_LEVEL_BASIC;
+    ) if $self->{debug} && $self->{loglevel} >= $self->LOG_LEVEL_BASIC;
   }
   return $mtime;
 }

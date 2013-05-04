@@ -1,14 +1,18 @@
 package Catalyst::Model::DBI::SQL::Library;
 
 use strict;
-use base qw( Catalyst::Model::DBI );
+use base qw/Catalyst::Model::DBI/;
 use NEXT;
 use SQL::Library;
 use File::Spec;
 
 use constant DEFAULT_ROOT_PATH => 'root/sql';
 
-our $VERSION = '0.16';
+use constant LOG_LEVEL_BASIC => 1;
+use constant LOG_LEVEL_MEDIUM => 2;
+use constant LOG_LEVEL_FULL => 3;
+
+our $VERSION = '0.17';
 
 __PACKAGE__->mk_accessors('sql');
 
@@ -26,19 +30,41 @@ Catalyst::Model::DBI::SQL::Library - SQL::Library DBI Model Class
 
   use base 'Catalyst::Model::DBI::SQL::Library';
 
+  # define configuration in package
+  
   __PACKAGE__->config(
     dsn => 'dbi:Pg:dbname=myapp',
+    username => 'postgres',
     password => '',
-    user => 'postgres',
     options => { AutoCommit => 1 },
     sqldir => 'root/sql2' #optional, will default to $c->path_to( 'root/sql' ),
     sqlcache => 1 #can only be used when queries are loaded from file i.e. via scalar passed to load
     sqlcache_use_mtime => 1 #will use modification time of the file to determine when to refresh the cache, make sure sqlcache = 1
+    loglevel = 1 #integer value to control log notifications between 1 and 3 with 3 being the most verbose, defaults to 1
   );
 
   1;
+  
+  # or define configuration in myapp.conf
+  
+  name MyApp
+
+  <Model::DBI::SQL::Library>
+    dsn "DBI:Pg:dbname=myapp"
+    username pgsql
+    password ""
+    <options>
+      AutoCommit 1
+    </options>
+    log_level 1
+    sqlcache 1
+    sqlcache_use_mtime 1
+  </Model>
+
+  # then in controller / model code
 
   my $model = $c->model( 'DBI::SQL::Library' );
+  
   my $sql = $model->load( 'something.sql' ) ;
 
   #or my $sql = $model->load( [ <FH> ] );
@@ -80,6 +106,7 @@ sub new {
   my ( $self, $c, @args ) = @_;
   $self = $self->NEXT::new( $c, @args );
   $self->{sqldir} ||= $c->path_to( DEFAULT_ROOT_PATH );
+  $self->{loglevel} ||= LOG_LEVEL_BASIC;
   $self->{log} = $c->log;
   $self->{debug} = $c->debug;
   return $self;
@@ -99,21 +126,21 @@ sub load {
     if ( $self->{sqlcache_use_mtime} && exists $source_cached->{mtime} ) {
       my $mtime_current = $self->_extract_mtime( $source );
       if ( $mtime_current != $source_cached->{mtime} ) {
-        $self->{log}->info(
+        $self->{log}->debug(
           qq/mtime changed for cached SQL::Library instance with path: "$source", reloading/
-        ) if $self->{debug};
+        ) if $self->{debug} && $self->{loglevel} >= LOG_LEVEL_MEDIUM;
         $self->_load_instance( $source );
       } else {
         $self->sql( $source_cached->{sql} );
-        $self->{log}->info(
+        $self->{log}->debug(
           qq/cached SQL::Library instance with path: "$source" and mtime: "$mtime_current" found/
-        ) if $self->{debug};
+        ) if $self->{debug} && $self->{loglevel} == LOG_LEVEL_FULL;
       }
     } else {
       $self->sql( $source_cached->{sql} );
-      $self->{log}->info(
+      $self->{log}->debug(
         qq/cached SQL::Library instance with path: "$source" found/
-      ) if $self->{debug};
+      ) if $self->{debug} && $self->{loglevel} == LOG_LEVEL_FULL;
     }
   } else {
     $self->_load_instance( $source );
@@ -125,13 +152,13 @@ sub _load_instance {
   my ( $self, $source ) = @_;
   eval { $self->sql( SQL::Library->new( { lib => $source } ) ); };
   if ( $@ ) {
-    $self->{log}->error(
+    $self->{log}->debug(
       qq/couldn't create SQL::Library instance with path: "$source" error: "$@"/
-    ) if $self->{debug};
+    ) if $self->{debug} && $self->{loglevel} >= LOG_LEVEL_BASIC;
   } else {
     $self->{log}->debug(
       qq/SQL::Library instance created with path: "$source"/
-    ) if $self->{debug};
+    ) if $self->{debug} && $self->{loglevel} >= LOG_LEVEL_BASIC;
     if ( $self->{sqlcache} && ref $source ne 'ARRAY' ) {
       if ( $self->{sqlcache_use_mtime} ) {
         my $mtime = $self->_extract_mtime( $source );
@@ -141,12 +168,12 @@ sub _load_instance {
         }; 
         $self->{log}->debug(
           qq/caching SQL::Library instance with path: "$source" and mtime: "$mtime"/
-        ) if $self->{debug};
+        ) if $self->{debug} && $self->{loglevel} >= LOG_LEVEL_MEDIUM;
       } else {
         $self->{obj_cache}->{$source} = { sql => $self->sql };
         $self->{log}->debug(
           qq/caching SQL::Library instance with path: "$source"/
-        ) if $self->{debug};
+        ) if $self->{debug} && $self->{loglevel} >= LOG_LEVEL_MEDIUM;
       }
     }
   }
@@ -158,9 +185,9 @@ sub _extract_mtime {
   if (-r $source) {
     $mtime = return (stat(_))[9];
   } else {
-    $self->{log}->warn(
+    $self->{log}->debug(
       qq/couldn't extract modification time for path: "$source"/
-    ) if $self->{debug};
+    ) if $self->{debug} && $self->{loglevel} >= LOG_LEVEL_BASIC;
   }
   return $mtime;
 }

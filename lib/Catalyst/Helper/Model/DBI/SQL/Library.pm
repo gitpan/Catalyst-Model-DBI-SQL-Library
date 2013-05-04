@@ -3,7 +3,7 @@ package Catalyst::Helper::Model::DBI::SQL::Library;
 use strict;
 use File::Spec;
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 =head1 NAME
 
@@ -34,13 +34,13 @@ Makes tests for the DBI Model.
 =cut
 
 sub mk_compclass {
-    my ( $self, $helper, $dsn, $user, $pass ) = @_;
-    $helper->{dsn}  = $dsn  || '';
-    $helper->{user} = $user || '';
-    $helper->{pass} = $pass || '';
-    my $file = $helper->{file};
-    $helper->render_file( 'dbislclass', $file );
-    return 1;
+  my ( $self, $helper, $dsn, $user, $pass ) = @_;
+  $helper->{dsn}  = $dsn  || '';
+  $helper->{user} = $user || '';
+  $helper->{pass} = $pass || '';
+  my $file = $helper->{file};
+  $helper->render_file( 'dbislclass', $file );
+  return 1;
 }
 
 =head1 SEE ALSO

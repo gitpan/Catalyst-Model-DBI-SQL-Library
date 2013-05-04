@@ -37,4 +37,4 @@ requires:
   SQL::Library: 0
   strict: 0
   warnings: 0
-version: 0.16
+version: 0.17

@@ -36,7 +36,7 @@ SYNOPSIS
         <options>
           AutoCommit 1
         </options>
-        log_level 1
+        loglevel 1
         sqlcache 1
         sqlcache_use_mtime 1
       </Model>

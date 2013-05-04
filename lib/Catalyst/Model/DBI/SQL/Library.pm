@@ -12,7 +12,7 @@ use constant LOG_LEVEL_BASIC => 1;
 use constant LOG_LEVEL_MEDIUM => 2;
 use constant LOG_LEVEL_FULL => 3;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 __PACKAGE__->mk_accessors('sql');
 
@@ -56,7 +56,7 @@ Catalyst::Model::DBI::SQL::Library - SQL::Library DBI Model Class
     <options>
       AutoCommit 1
     </options>
-    log_level 1
+    loglevel 1
     sqlcache 1
     sqlcache_use_mtime 1
   </Model>
